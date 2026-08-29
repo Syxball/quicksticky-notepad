@@ -24,8 +24,9 @@ omarchy plugin update quicksticky.notepad
 |------|---------|
 | `docs/CHANGELOG.md` | Full changelog — one entry per version |
 | `docs/DOCUMENTATION.md` | User-facing guide — architecture and behavior |
-| `docs/TODO.md` | Open tasks, kept up to date as work progresses |
-| `docs/RELEASE-CHECKLIST.md` | Checklist for the release currently in progress |
+
+`docs/TODO.md` and `docs/RELEASE-CHECKLIST.md` are kept locally for personal
+tracking and aren't part of this repo.
 
 ---
 

@@ -7,3 +7,8 @@
 
 # Local backups made while hand-editing plugin files
 *.bak.*
+
+# Personal working notes — not meant for the public repo
+docs/RELEASE-CHECKLIST.md
+docs/TODO.md
+docs/completed/
