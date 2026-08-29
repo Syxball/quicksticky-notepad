@@ -1,0 +1,9 @@
+# OS cruft
+.DS_Store
+
+# Editor
+*.swp
+*.swo
+
+# Local backups made while hand-editing plugin files
+*.bak.*

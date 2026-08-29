@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "quicksticky.notepad",
+  "name": "Notepad",
+  "version": "1.0.0",
+  "author": "syxball",
+  "description": "Persistent scratch notepad with multiple pages",
+  "kinds": [
+    "overlay",
+    "bar-widget"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "overlay": "Notepad.qml",
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Notepad",
+    "description": "Quick persistent notes",
+    "category": "Info",
+    "allowMultiple": false
+  }
+}
