@@ -4,6 +4,8 @@ Persistent multi-page scratch notepad for [Omarchy](https://omarchy.org/) —
 markdown Text/Preview toggle, per-note colors, draggable/resizable overlay,
 bar-widget launcher. Built as a Quickshell/QML plugin for `omarchy-shell`.
 
+![Quick Sticky overlay showing the Grocery List note in pink, with Text/Preview toggle, page navigation, and color swatches](docs/images/overlay-preview.png)
+
 ---
 
 ## Install
