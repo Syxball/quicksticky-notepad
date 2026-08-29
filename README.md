@@ -34,6 +34,9 @@ tracking and aren't part of this repo.
 
 ## Version History
 
+Every version is listed here, including patches — this repo intentionally
+breaks from the workspace default of showing minor/major only.
+
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
 | 1.0.0 | 2026-08-29 | syxball | First public release — quick-sticky-notes plugin |
