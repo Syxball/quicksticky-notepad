@@ -246,27 +246,47 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             spacing: Style.space(6)
 
-            Button {
-              text: "Text"
-              bordered: true
-              selected: root.mode === "text"
-              foreground: root.contentForeground
-              fontSize: Style.font.bodySmall
-              verticalPadding: Style.space(4)
-              onClicked: {
-                root.mode = "text"
-                Qt.callLater(function() { textArea.forceActiveFocus() })
-              }
-            }
+            Repeater {
+              model: [
+                { label: "Text", value: "text" },
+                { label: "Preview", value: "preview" }
+              ]
 
-            Button {
-              text: "Preview"
-              bordered: true
-              selected: root.mode === "preview"
-              foreground: root.contentForeground
-              fontSize: Style.font.bodySmall
-              verticalPadding: Style.space(4)
-              onClicked: root.mode = "preview"
+              // A self-drawn toggle rather than the shared Button: its selected-state
+              // fill/text color is theme-token driven (can resolve against the global
+              // accent instead of our card color), which goes unreadable against
+              // non-default note colors. Deriving both states from contentForeground
+              // directly guarantees contrast against any card color.
+              delegate: Rectangle {
+                readonly property bool tabSelected: root.mode === modelData.value
+
+                implicitWidth: tabLabel.implicitWidth + Style.space(16)
+                implicitHeight: tabLabel.implicitHeight + Style.space(8)
+                radius: Style.cornerRadius
+                color: tabSelected ? Util.alpha(root.contentForeground, 0.18) : "transparent"
+                border.color: root.contentForeground
+                border.width: Math.max(1, Style.space(1))
+
+                Text {
+                  id: tabLabel
+                  anchors.centerIn: parent
+                  text: modelData.label
+                  color: root.contentForeground
+                  font.family: Style.font.family
+                  font.pixelSize: Style.font.bodySmall
+                  font.bold: tabSelected
+                }
+
+                MouseArea {
+                  anchors.fill: parent
+                  cursorShape: Qt.PointingHandCursor
+                  onClicked: {
+                    root.mode = modelData.value
+                    if (modelData.value === "text")
+                      Qt.callLater(function() { textArea.forceActiveFocus() })
+                  }
+                }
+              }
             }
 
             PanelActionButton {
