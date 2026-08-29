@@ -234,7 +234,7 @@ Item {
           Text {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
-            text: "Notepad"
+            text: "Quick Sticky"
             color: root.contentForeground
             font.family: Style.font.family
             font.pixelSize: Style.font.heading
