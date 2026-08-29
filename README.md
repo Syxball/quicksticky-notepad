@@ -41,9 +41,6 @@ The title bar (drag) and the `◢` grip (bottom-right corner) do the same with t
 | `docs/CHANGELOG.md` | Full changelog — one entry per version |
 | `docs/DOCUMENTATION.md` | User-facing guide — architecture and behavior |
 
-`docs/TODO.md` and `docs/RELEASE-CHECKLIST.md` are kept locally for personal
-tracking and aren't part of this repo.
-
 ---
 
 ## Version History
