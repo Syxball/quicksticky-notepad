@@ -9,6 +9,6 @@ Version format: `MAJOR.MINOR.PATCH`
 
 ---
 
-## 0.1.0 (2026-08-28)
+## 1.0.0 (2026-08-29)
 
 - Added `quicksticky.notepad` plugin: persistent multi-page notepad overlay with a markdown Text/Preview toggle, per-note color picker (7 swatches, contrast-aware text), a draggable and resizable window (mouse + Alt-based hotkeys), and a bar-widget launcher

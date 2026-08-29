@@ -1,4 +1,4 @@
-# Release Checklist — 0.1.0 (MINOR)
+# Release Checklist — 1.0.0 (MAJOR)
 
 ## 1. New this release
 
