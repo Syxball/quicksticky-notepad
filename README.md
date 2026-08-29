@@ -6,7 +6,9 @@ bar-widget launcher. Built as a Quickshell/QML plugin for `omarchy-shell`.
 
 ![Quick Sticky overlay showing the Grocery List note in pink, with Text/Preview toggle, page navigation, and color swatches](docs/images/overlay-preview.png)
 
-<video src="docs/images/quicksticky_demo.mp4" controls muted title="Quick Sticky demo"></video>
+![Quick Sticky demo — typing, markdown preview, color picker, and window drag/resize](docs/images/quicksticky_demo.gif)
+
+Full-quality recording: [`docs/images/quicksticky_demo.mp4`](docs/images/quicksticky_demo.mp4)
 
 ---
 
