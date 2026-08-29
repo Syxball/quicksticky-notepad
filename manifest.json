@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "quicksticky.notepad",
   "name": "Quick Sticky",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "syxball",
   "description": "Persistent scratch notepad with multiple pages",
   "kinds": [

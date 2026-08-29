@@ -40,6 +40,7 @@ tracking and aren't part of this repo.
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
+| 1.0.1 | 2026-08-30 | syxball | Renamed app title to Quick Sticky; added README screenshot and demo GIF |
 | 1.0.0 | 2026-08-29 | syxball | First public release — quick-sticky-notes plugin |
 
 _Full change history in [CHANGELOG.md](docs/CHANGELOG.md)._
