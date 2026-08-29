@@ -6,11 +6,6 @@ A single Omarchy shell plugin (Quickshell/QML): a persistent scratch notepad,
 distributed as its own git repo so `omarchy plugin add` / `omarchy plugin
 update` can install and update it directly.
 
-This is not a Python project, so the `src/` + `run.sh` parts of the
-workspace's default project scaffold don't apply — there's no standalone app
-to launch. "Running" the plugin means installing and enabling it in the shell
-(see below).
-
 ## Architecture
 
 | File | Responsibility |
