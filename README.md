@@ -36,3 +36,9 @@ omarchy plugin update quicksticky.notepad
 | 0.1.0 | 2026-08-28 | syxball | Initial release — quick-sticky-notes plugin |
 
 _Full change history in [CHANGELOG.md](docs/CHANGELOG.md)._
+
+---
+
+## License
+
+[MIT](LICENSE)
