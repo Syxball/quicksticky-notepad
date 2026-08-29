@@ -24,6 +24,16 @@ omarchy plugin add https://github.com/Syxball/quicksticky-notepad.git --enable
 omarchy plugin update quicksticky.notepad
 ```
 
+## Hotkeys
+
+| Keys | Action |
+|------|--------|
+| `Alt` + `Arrows` | Move the window |
+| `Alt` + `Shift` + `Arrows` | Resize the window |
+| `Alt` + `0` | Reset window to the default centered size/position |
+
+The title bar (drag) and the `◢` grip (bottom-right corner) do the same with the mouse.
+
 ## Documents
 
 | File | Purpose |
