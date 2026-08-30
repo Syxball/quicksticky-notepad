@@ -1,15 +1,25 @@
-function defaultPage() {
-  return { text: "", color: "" }
+function defaultPage(color) {
+  return { text: "", color: String(color || "") }
+}
+
+function defaultSettings() {
+  return { defaultColor: "" }
 }
 
 function defaultState() {
-  return { pages: [defaultPage()], currentPage: 0 }
+  return { pages: [defaultPage()], currentPage: 0, settings: defaultSettings() }
 }
 
 function normalizePage(p) {
   if (typeof p === "string") return { text: p, color: "" }
   if (p && typeof p === "object") return { text: String(p.text || ""), color: String(p.color || "") }
   return defaultPage()
+}
+
+function normalizeSettings(s) {
+  var d = defaultSettings()
+  if (!s || typeof s !== "object") return d
+  return { defaultColor: String(s.defaultColor || d.defaultColor) }
 }
 
 function parseNotepadFile(text) {
@@ -24,14 +34,19 @@ function parseNotepadFile(text) {
     var currentPage = Number(parsed.currentPage)
     if (isNaN(currentPage) || currentPage < 0 || currentPage >= pages.length) currentPage = 0
 
-    return { pages: pages, currentPage: currentPage }
+    return { pages: pages, currentPage: currentPage, settings: normalizeSettings(parsed.settings) }
   } catch (e) {
     return defaultState()
   }
 }
 
-function serializeNotepad(pages, currentPage) {
-  return JSON.stringify({ version: 2, pages: pages, currentPage: currentPage }, null, 2) + "\n"
+function serializeNotepad(pages, currentPage, settings) {
+  return JSON.stringify({
+    version: 2,
+    pages: pages,
+    currentPage: currentPage,
+    settings: normalizeSettings(settings)
+  }, null, 2) + "\n"
 }
 
 function luminance(hex) {
@@ -64,6 +79,7 @@ var palette = [
 if (typeof module !== "undefined") {
   module.exports = {
     defaultPage: defaultPage,
+    defaultSettings: defaultSettings,
     defaultState: defaultState,
     parseNotepadFile: parseNotepadFile,
     serializeNotepad: serializeNotepad,

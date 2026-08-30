@@ -19,6 +19,7 @@ Item {
   property bool stateLoaded: false
   property string mode: "text" // "text" | "preview"
   property bool showSettings: false
+  property var settings: NotepadModel.defaultSettings()
   readonly property int pageCount: root.pages.length
 
   readonly property var currentPageData: (root.currentPage >= 0 && root.currentPage < root.pages.length)
@@ -105,9 +106,14 @@ Item {
 
   function newPage() {
     var next = root.pages.slice()
-    next.push({ text: "", color: "" })
+    next.push(NotepadModel.defaultPage(root.settings.defaultColor))
     root.pages = next
     root.goToPage(next.length - 1)
+    saveTimer.restart()
+  }
+
+  function setDefaultColor(colorHex) {
+    root.settings = { defaultColor: colorHex }
     saveTimer.restart()
   }
 
@@ -125,13 +131,14 @@ Item {
     var state = NotepadModel.parseNotepadFile(raw)
     root.pages = state.pages
     root.currentPage = state.currentPage
+    root.settings = state.settings
     root.stateLoaded = true
     textArea.text = root.currentPageText
   }
 
   function flushState() {
     if (!root.stateLoaded) return
-    notepadFile.setText(NotepadModel.serializeNotepad(root.pages, root.currentPage))
+    notepadFile.setText(NotepadModel.serializeNotepad(root.pages, root.currentPage, root.settings))
   }
 
   Process {
@@ -399,7 +406,7 @@ Item {
         }
 
         // ---- Settings drawer: expands in place when the gear is clicked.
-        // Populated one setting at a time; empty for now beyond the label.
+        // Populated one setting at a time.
         Column {
           id: settingsDrawer
           visible: root.showSettings
@@ -414,6 +421,58 @@ Item {
             font.bold: true
             font.letterSpacing: 1
             topPadding: Style.space(2)
+          }
+
+          Item {
+            width: parent.width
+            height: Style.space(20)
+
+            Text {
+              anchors.left: parent.left
+              anchors.verticalCenter: parent.verticalCenter
+              text: "Default note color"
+              color: root.contentForeground
+              font.family: Style.font.family
+              font.pixelSize: Style.font.bodySmall
+            }
+
+            Row {
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              spacing: Style.space(5)
+
+              Repeater {
+                model: NotepadModel.palette
+
+                Rectangle {
+                  required property var modelData
+
+                  width: Style.space(14)
+                  height: Style.space(14)
+                  radius: width / 2
+                  anchors.verticalCenter: parent.verticalCenter
+                  color: modelData.value || root.background
+                  border.width: root.settings.defaultColor === modelData.value ? 2 : 1
+                  border.color: root.settings.defaultColor === modelData.value
+                    ? root.contentForeground
+                    : Qt.darker(root.contentForeground, 1.6)
+
+                  MouseArea {
+                    id: defaultSwatchMouse
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.setDefaultColor(modelData.value)
+                  }
+
+                  ToolTip {
+                    visible: defaultSwatchMouse.containsMouse
+                    text: modelData.name
+                    delay: 400
+                  }
+                }
+              }
+            }
           }
         }
 
