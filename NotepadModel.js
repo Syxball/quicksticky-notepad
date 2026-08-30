@@ -2,8 +2,10 @@ function defaultPage(color) {
   return { text: "", color: String(color || "") }
 }
 
+var startupPositions = ["center", "top-left", "top-right", "bottom-left", "bottom-right"]
+
 function defaultSettings() {
-  return { defaultColor: "" }
+  return { defaultColor: "", startupPosition: "center" }
 }
 
 function defaultState() {
@@ -19,7 +21,8 @@ function normalizePage(p) {
 function normalizeSettings(s) {
   var d = defaultSettings()
   if (!s || typeof s !== "object") return d
-  return { defaultColor: String(s.defaultColor || d.defaultColor) }
+  var startupPosition = startupPositions.indexOf(s.startupPosition) >= 0 ? s.startupPosition : d.startupPosition
+  return { defaultColor: String(s.defaultColor || d.defaultColor), startupPosition: startupPosition }
 }
 
 function parseNotepadFile(text) {
@@ -84,6 +87,7 @@ if (typeof module !== "undefined") {
     parseNotepadFile: parseNotepadFile,
     serializeNotepad: serializeNotepad,
     readableTextColor: readableTextColor,
-    palette: palette
+    palette: palette,
+    startupPositions: startupPositions
   }
 }

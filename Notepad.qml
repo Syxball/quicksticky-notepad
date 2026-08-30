@@ -43,16 +43,30 @@ Item {
   property real userCardHeight: Style.space(400)
   property real cardOffsetX: 0
   property real cardOffsetY: 0
+  // True once the user drags/Alt+Arrow-moves the window this session, so a
+  // configured startup corner never fights a deliberate move.
+  property bool userMoved: false
   readonly property real minCardWidth: Style.space(320)
   readonly property real minCardHeight: Style.space(240)
   property int cardWidth: Math.max(root.minCardWidth, Math.min(root.userCardWidth, panel.width - Style.gapsOut * 2))
   property int cardHeight: Math.max(root.minCardHeight, Math.min(root.userCardHeight, panel.height - Style.gapsOut * 2))
+
+  // Converts the card's current on-screen position (which may be a
+  // startup-corner snap, not offset-driven at all) into the equivalent
+  // center-relative offset, so switching to manual move/resize continues
+  // smoothly from there instead of jumping to center+delta.
+  function seedManualOffset() {
+    root.cardOffsetX = card.x - (panel.width - card.width) / 2
+    root.cardOffsetY = card.y - (panel.height - card.height) / 2
+    root.userMoved = true
+  }
 
   function resetGeometry() {
     root.userCardWidth = Style.space(460)
     root.userCardHeight = Style.space(400)
     root.cardOffsetX = 0
     root.cardOffsetY = 0
+    root.userMoved = false
   }
 
   // Note color overrides the card background; text/icons switch to a
@@ -112,9 +126,17 @@ Item {
     saveTimer.restart()
   }
 
-  function setDefaultColor(colorHex) {
-    root.settings = { defaultColor: colorHex }
+  function updateSettings(patch) {
+    root.settings = Object.assign({}, root.settings, patch)
     saveTimer.restart()
+  }
+
+  function setDefaultColor(colorHex) {
+    root.updateSettings({ defaultColor: colorHex })
+  }
+
+  function setStartupPosition(pos) {
+    root.updateSettings({ startupPosition: pos })
   }
 
   function deletePage() {
@@ -193,8 +215,22 @@ Item {
       width: root.cardWidth
       height: root.cardHeight
       radius: root.cornerRadius
-      x: Math.max(0, Math.min(panel.width - width, (panel.width - width) / 2 + root.cardOffsetX))
-      y: Math.max(0, Math.min(panel.height - height, (panel.height - height) / 2 + root.cardOffsetY))
+      // Fully reactive rather than a one-shot pixel computation: panel.width/
+      // height start at a Qt placeholder size before the compositor reports
+      // real layer-shell geometry, so this must recompute once they change,
+      // not bake in a number from whatever they were at load time.
+      readonly property real startupMargin: Style.space(16)
+      readonly property bool startupRight: root.settings.startupPosition === "top-right" || root.settings.startupPosition === "bottom-right"
+      readonly property bool startupLeft: root.settings.startupPosition === "top-left" || root.settings.startupPosition === "bottom-left"
+      readonly property bool startupBottom: root.settings.startupPosition === "bottom-left" || root.settings.startupPosition === "bottom-right"
+      readonly property bool startupTop: root.settings.startupPosition === "top-left" || root.settings.startupPosition === "top-right"
+
+      x: (!root.userMoved && startupRight) ? Math.max(0, panel.width - width - startupMargin)
+        : (!root.userMoved && startupLeft) ? Math.min(panel.width - width, startupMargin)
+        : Math.max(0, Math.min(panel.width - width, (panel.width - width) / 2 + root.cardOffsetX))
+      y: (!root.userMoved && startupBottom) ? Math.max(0, panel.height - height - startupMargin)
+        : (!root.userMoved && startupTop) ? Math.min(panel.height - height, startupMargin)
+        : Math.max(0, Math.min(panel.height - height, (panel.height - height) / 2 + root.cardOffsetY))
       color: root.cardColor
       borderSpec: root.borderSpec
       padding: root.contentMargin
@@ -225,7 +261,10 @@ Item {
             cursorShape: Qt.SizeAllCursor
             property point lastPos: Qt.point(0, 0)
 
-            onPressed: function(mouse) { lastPos = Qt.point(mouse.x, mouse.y) }
+            onPressed: function(mouse) {
+              lastPos = Qt.point(mouse.x, mouse.y)
+              root.seedManualOffset()
+            }
             onPositionChanged: function(mouse) {
               if (!pressed) return
               root.cardOffsetX += (mouse.x - lastPos.x)
@@ -475,6 +514,75 @@ Item {
             }
           }
 
+          Item {
+            width: parent.width
+            height: Style.space(20)
+
+            Text {
+              anchors.left: parent.left
+              anchors.verticalCenter: parent.verticalCenter
+              text: "Startup position"
+              color: root.contentForeground
+              font.family: Style.font.family
+              font.pixelSize: Style.font.bodySmall
+            }
+
+            Row {
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              spacing: Style.space(4)
+
+              Repeater {
+                model: [
+                  { name: "Center", value: "center", glyph: "⊙" },
+                  { name: "Top left", value: "top-left", glyph: "↖" },
+                  { name: "Top right", value: "top-right", glyph: "↗" },
+                  { name: "Bottom left", value: "bottom-left", glyph: "↙" },
+                  { name: "Bottom right", value: "bottom-right", glyph: "↘" }
+                ]
+
+                // Same self-drawn approach as the Text/Preview tabs: colors
+                // derive from contentForeground directly rather than the
+                // shared Button's theme-token selected state, which isn't
+                // guaranteed to stay readable against an arbitrary card color.
+                delegate: Rectangle {
+                  required property var modelData
+                  readonly property bool posSelected: root.settings.startupPosition === modelData.value
+
+                  width: Style.space(18)
+                  height: Style.space(18)
+                  radius: Style.cornerRadius
+                  color: posSelected ? Util.alpha(root.contentForeground, 0.18) : "transparent"
+                  border.color: root.contentForeground
+                  border.width: Math.max(1, Style.space(1))
+
+                  Text {
+                    anchors.centerIn: parent
+                    text: modelData.glyph
+                    color: root.contentForeground
+                    font.family: Style.font.family
+                    font.pixelSize: Style.font.bodySmall
+                    font.bold: posSelected
+                  }
+
+                  MouseArea {
+                    id: posMouse
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.setStartupPosition(modelData.value)
+                  }
+
+                  ToolTip {
+                    visible: posMouse.containsMouse
+                    text: modelData.name
+                    delay: 400
+                  }
+                }
+              }
+            }
+          }
+
           Text {
             text: "HOTKEYS"
             color: Qt.darker(root.contentForeground, 1.3)
@@ -577,18 +685,20 @@ Item {
                   if (event.key === Qt.Key_0) {
                     root.resetGeometry(); event.accepted = true
                   } else if (event.key === Qt.Key_Right) {
-                    if (resizing) root.userCardWidth += step; else root.cardOffsetX += step
+                    if (resizing) { root.userCardWidth += step }
+                    else { root.seedManualOffset(); root.cardOffsetX += step }
                     event.accepted = true
                   } else if (event.key === Qt.Key_Left) {
-                    if (resizing) root.userCardWidth = Math.max(root.minCardWidth, root.userCardWidth - step)
-                    else root.cardOffsetX -= step
+                    if (resizing) { root.userCardWidth = Math.max(root.minCardWidth, root.userCardWidth - step) }
+                    else { root.seedManualOffset(); root.cardOffsetX -= step }
                     event.accepted = true
                   } else if (event.key === Qt.Key_Down) {
-                    if (resizing) root.userCardHeight += step; else root.cardOffsetY += step
+                    if (resizing) { root.userCardHeight += step }
+                    else { root.seedManualOffset(); root.cardOffsetY += step }
                     event.accepted = true
                   } else if (event.key === Qt.Key_Up) {
-                    if (resizing) root.userCardHeight = Math.max(root.minCardHeight, root.userCardHeight - step)
-                    else root.cardOffsetY -= step
+                    if (resizing) { root.userCardHeight = Math.max(root.minCardHeight, root.userCardHeight - step) }
+                    else { root.seedManualOffset(); root.cardOffsetY -= step }
                     event.accepted = true
                   }
                 }
