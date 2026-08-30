@@ -9,6 +9,13 @@ Version format: `MAJOR.MINOR.PATCH`
 
 ---
 
+## 1.1.0 (2026-08-30)
+
+- Added an in-overlay settings menu: a gear icon expands a collapsible drawer inside the same card, no new manifest entry point
+- Added a default note color setting — new pages/notes start with the picked swatch instead of always the default
+- Added a hotkeys reference to the settings drawer, so the move/resize/reset shortcuts are discoverable in-app
+- Added a default startup window position setting (center + 4 corners); manual drag/resize still overrides it for the rest of the session, and `Alt+0` now resets back to the configured position rather than a hardcoded center
+
 ## 1.0.1 (2026-08-30)
 
 - Renamed the displayed app title from "Notepad" to "Quick Sticky" (overlay title bar, bar-widget tooltip, manifest name)

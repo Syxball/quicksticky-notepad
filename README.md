@@ -47,6 +47,7 @@ The title bar (drag) and the `◢` grip (bottom-right corner) do the same with t
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
+| 1.1.0 | 2026-08-30 | syxball | Added in-overlay settings menu: default note color, hotkeys reference, default startup position |
 | 1.0.1 | 2026-08-30 | syxball | Renamed app title to Quick Sticky; added README screenshot and demo GIF |
 | 1.0.0 | 2026-08-29 | syxball | First public release — quick-sticky-notes plugin |
 
