@@ -5,7 +5,7 @@ function defaultPage(color) {
 var startupPositions = ["center", "top-left", "top-right", "bottom-left", "bottom-right"]
 
 function defaultSettings() {
-  return { defaultColor: "", startupPosition: "center" }
+  return { defaultColor: "", startupPosition: "center", autoRenderPreview: false }
 }
 
 function defaultState() {
@@ -22,7 +22,11 @@ function normalizeSettings(s) {
   var d = defaultSettings()
   if (!s || typeof s !== "object") return d
   var startupPosition = startupPositions.indexOf(s.startupPosition) >= 0 ? s.startupPosition : d.startupPosition
-  return { defaultColor: String(s.defaultColor || d.defaultColor), startupPosition: startupPosition }
+  return {
+    defaultColor: String(s.defaultColor || d.defaultColor),
+    startupPosition: startupPosition,
+    autoRenderPreview: typeof s.autoRenderPreview === "boolean" ? s.autoRenderPreview : d.autoRenderPreview
+  }
 }
 
 function parseNotepadFile(text) {

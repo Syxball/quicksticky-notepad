@@ -113,6 +113,7 @@ Item {
     if (index < 0 || index >= root.pages.length) return
     root.currentPage = index
     textArea.text = root.currentPageText
+    autoRenderTimer.stop()
   }
 
   function nextPage() { root.goToPage(root.currentPage + 1) }
@@ -137,6 +138,10 @@ Item {
 
   function setStartupPosition(pos) {
     root.updateSettings({ startupPosition: pos })
+  }
+
+  function setAutoRenderPreview(enabled) {
+    root.updateSettings({ autoRenderPreview: enabled })
   }
 
   function deletePage() {
@@ -184,6 +189,20 @@ Item {
     interval: 400
     repeat: false
     onTriggered: root.flushState()
+  }
+
+  // When enabled, switches to Preview a beat after typing stops — restarted
+  // on every keystroke so it only fires once you actually pause. Going back
+  // to Text still needs the button/click (Preview isn't editable), so this
+  // only automates the type -> see-it-rendered direction.
+  Timer {
+    id: autoRenderTimer
+    interval: 800
+    repeat: false
+    onTriggered: {
+      if (root.settings.autoRenderPreview && root.mode === "text")
+        root.mode = "preview"
+    }
   }
 
   Component.onCompleted: {
@@ -583,6 +602,51 @@ Item {
             }
           }
 
+          Item {
+            width: parent.width
+            height: Style.space(20)
+
+            Text {
+              anchors.left: parent.left
+              anchors.verticalCenter: parent.verticalCenter
+              text: "Auto-render preview"
+              color: root.contentForeground
+              font.family: Style.font.family
+              font.pixelSize: Style.font.bodySmall
+            }
+
+            Rectangle {
+              id: autoRenderSwitch
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              width: Style.space(30)
+              height: Style.space(17)
+              radius: height / 2
+              color: root.settings.autoRenderPreview
+                ? Util.alpha(root.contentForeground, 0.45)
+                : Util.alpha(root.contentForeground, 0.16)
+              border.color: root.contentForeground
+              border.width: 1
+
+              Rectangle {
+                width: Style.space(13)
+                height: Style.space(13)
+                radius: width / 2
+                anchors.verticalCenter: parent.verticalCenter
+                x: root.settings.autoRenderPreview ? parent.width - width - 2 : 2
+                color: root.contentForeground
+
+                Behavior on x { NumberAnimation { duration: 120 } }
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: root.setAutoRenderPreview(!root.settings.autoRenderPreview)
+              }
+            }
+          }
+
           Text {
             text: "HOTKEYS"
             color: Qt.darker(root.contentForeground, 1.3)
@@ -663,8 +727,14 @@ Item {
               placeholderTextColor: Qt.darker(root.contentForeground, 1.6)
 
               onTextChanged: {
-                if (root.stateLoaded && text !== root.currentPageText)
+                // Guarded by the same divergence check as the save call below,
+                // so loading a page or switching pages (which set text to
+                // already match currentPageText) never counts as "typing" and
+                // triggers an unwanted auto-switch to Preview.
+                if (root.stateLoaded && text !== root.currentPageText) {
                   root.setCurrentText(text)
+                  if (root.settings.autoRenderPreview) autoRenderTimer.restart()
+                }
               }
 
               // Overrides the default word-jump on Ctrl+Left/Right in favor of
