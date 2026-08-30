@@ -18,6 +18,7 @@ Item {
   property int currentPage: 0
   property bool stateLoaded: false
   property string mode: "text" // "text" | "preview"
+  property bool showSettings: false
   readonly property int pageCount: root.pages.length
 
   readonly property var currentPageData: (root.currentPage >= 0 && root.currentPage < root.pages.length)
@@ -290,6 +291,13 @@ Item {
             }
 
             PanelActionButton {
+              iconText: "⚙"
+              tooltipText: "Settings"
+              foreground: root.contentForeground
+              onClicked: root.showSettings = !root.showSettings
+            }
+
+            PanelActionButton {
               iconText: "✕"
               tooltipText: "Close"
               foreground: root.contentForeground
@@ -300,6 +308,7 @@ Item {
 
         // ---- Row 2: page navigation, note color swatches.
         Item {
+          id: row2
           width: parent.width
           height: Style.space(24)
 
@@ -389,7 +398,27 @@ Item {
           }
         }
 
+        // ---- Settings drawer: expands in place when the gear is clicked.
+        // Populated one setting at a time; empty for now beyond the label.
+        Column {
+          id: settingsDrawer
+          visible: root.showSettings
+          width: parent.width
+          spacing: Style.space(6)
+
+          Text {
+            text: "SETTINGS"
+            color: Qt.darker(root.contentForeground, 1.3)
+            font.family: Style.font.family
+            font.pixelSize: Style.font.bodySmall
+            font.bold: true
+            font.letterSpacing: 1
+            topPadding: Style.space(2)
+          }
+        }
+
         Rectangle {
+          id: divider
           width: parent.width
           height: Style.spacing.hairline
           color: root.contentForeground
@@ -401,7 +430,9 @@ Item {
         Item {
           id: body
           width: parent.width
-          height: parent.height - Style.space(28) - Style.space(24) - Style.space(16) - Style.spacing.hairline
+          height: parent.height - titleRow.height - row2.height - divider.height
+            - (settingsDrawer.visible ? settingsDrawer.height : 0)
+            - parent.spacing * (settingsDrawer.visible ? 4 : 3)
 
           ScrollView {
             anchors.fill: parent
