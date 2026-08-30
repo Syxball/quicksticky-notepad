@@ -474,6 +474,49 @@ Item {
               }
             }
           }
+
+          Text {
+            text: "HOTKEYS"
+            color: Qt.darker(root.contentForeground, 1.3)
+            font.family: Style.font.family
+            font.pixelSize: Style.font.bodySmall
+            font.bold: true
+            font.letterSpacing: 1
+            topPadding: Style.space(6)
+          }
+
+          Repeater {
+            model: [
+              { action: "Move window", keys: "Alt + Arrows" },
+              { action: "Resize window", keys: "Alt + Shift + Arrows" },
+              { action: "Reset window", keys: "Alt + 0" }
+            ]
+
+            Item {
+              required property var modelData
+
+              width: parent.width
+              height: Style.space(18)
+
+              Text {
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                text: parent.modelData.action
+                color: root.contentForeground
+                font.family: Style.font.family
+                font.pixelSize: Style.font.bodySmall
+              }
+
+              Text {
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                text: parent.modelData.keys
+                color: Qt.darker(root.contentForeground, 1.3)
+                font.family: Style.font.family
+                font.pixelSize: Style.font.bodySmall
+              }
+            }
+          }
         }
 
         Rectangle {
